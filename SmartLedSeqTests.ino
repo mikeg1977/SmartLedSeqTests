@@ -96,3 +96,18 @@ void brightFade(uint32_t color, int wait, int brightLevel) {
   }
 }
 
+/* 
+effectively brightness goes from 0 to 255, but the effective range and visual effect differs, hence the offset
+ So what we do is take the incoming numbers, remove the offsets and scale them from there, only re-introducing the brightness offset when returning
+LED functional limits to first 2 variables, Tacho range and value to the last 3
+Return the actual desired LED brightness
+*/
+
+int ledBrightRescale(int ledStripBrightness0pcOffset, int ledStripBrightness100pcOffset, int ledStripLowRescale, int ledStripHiRescale, int ledRescaleValue) {
+  int ledStripUsingScale = 255 - ledStripBrightness0pcOffset - ledStripBrightness100pcOffset;
+
+  if (ledRescaleValue < ledStripLowRescale) return (ledStripBrightness0pcOffset);
+  if (ledRescaleValue > ledStripHiRescale) return (255-ledStripBrightness100pcOffset);
+  return (ledStripBrightness0pcOffset+(ledStripUsingScale*(ledRescaleValue-ledStripLowRescale)/(ledStripHiRescale-ledStripLowRescale)));
+}
+
